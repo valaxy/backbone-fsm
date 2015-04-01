@@ -30,27 +30,34 @@ define(function (require) {
 	})
 
 	QUnit.test('mixin View', function (assert) {
-		var View = backboneFSM.mixin(Backbone.View.extend({
+		var count = 0
+		var View = backboneFSM.mixinView(Backbone.View.extend({
 			fsm: {
 				initial: 'hide',
+				hide: {
+					'click': function () {
+						count++
+						this.$el.show()
+					}
+				},
+				show: {
+					'click': function () {
+						count++
+						this.$el.hide()
+					}
+				},
 				events: [
 					{name: 'open', from: 'hide', to: 'show'},
 					{name: 'close', from: 'show', to: 'hide'}
-				],
-				callbacks: {
-					onafteropen: function (event, from, to, msg) {
-						assert.equal(this, view)
-						assert.equal(msg, 'test')
-					},
-					onbeforeclose: function () {
-						assert.equal(this, view)
-					}
-				}
+				]
 			}
 		}))
 
 		var view = new View
-		view.open('test')
-		view.close()
+		view.$el.click()
+		assert.equal(count, 1)
+
+		view.$el.click()
+		assert.equal(count, 2)
 	})
 })
