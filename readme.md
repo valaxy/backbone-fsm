@@ -18,6 +18,19 @@ requirejs.config({
 
 ```
 
+## Use
+```javascript
+require('backbone')
+var backboneFSM = require('backbone-fsm')
+
+// mixin Model
+var Model = Backbone.Model.extend({ ... })
+backboneFSM.mixin(Model)
+
+// mixin View
+var View = backboneFSM.mixin(Backbone.View.extend({ ... }))
+```
+
 ## Callbacks
 
 ## Events

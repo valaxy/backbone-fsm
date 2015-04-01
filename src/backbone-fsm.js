@@ -23,12 +23,12 @@ define(function (require, exports) {
 	}
 
 
-	exports.mixin = function (Model) {
-		var oldInitialize = Model.prototype.initialize
+	exports.mixin = function (BackboneClass) {
+		var oldInitialize = BackboneClass.prototype.initialize
 
-		Model.prototype.initialize = function () {
-			if (Model.prototype.fsm) {
-				var config = Model.prototype.fsm
+		BackboneClass.prototype.initialize = function () {
+			if (BackboneClass.prototype.fsm) {
+				var config = BackboneClass.prototype.fsm
 				handleCallbacks(config, this)
 
 				var fsm = stateMachine.create(config) // no change prototype
@@ -37,6 +37,8 @@ define(function (require, exports) {
 
 			oldInitialize.apply(this, arguments)
 		}
+
+		return BackboneClass
 	}
 
 })
