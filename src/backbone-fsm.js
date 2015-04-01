@@ -4,24 +4,40 @@ define(function (require, exports) {
 	var _ = require('underscore')
 
 
-	var handleCallbacks = function (config, context) {
-		for (var name in config.callbacks) {
-			config.callbacks[name] = config.callbacks[name].bind(context)
+	//var handleCallbacks = function (config, context) {
+	//	for (var name in config.callbacks) {
+	//		config.callbacks[name] = config.callbacks[name].bind(context)
+	//	}
+	//}
+
+
+	var addCallbacks = function (config, context) {
+		config.callbacks = {
+			onenterstate: (function (event, from, to) {
+				this.trigger('to:' + to, Array.prototype.slice.call(arguments, 1))
+			}).bind(context),
+			onafterevent: (function (event) {
+				this.trigger('trans:' + event, Array.prototype.slice.call(arguments, 3))
+			}).bind(context)
 		}
 	}
 
-	var mixinTransitions = function (config, fsm, context) {
-		var transitions = _.map(config.events, function (transition) {
-			return transition.name
-		})
-		transitions = _.uniq(transitions)
 
-		// bind all functions
-		_.each(transitions, function (tran) {
-			context[tran] = fsm[tran].bind(fsm)
-		})
-	}
+	//// for Model
+	//var mixinTransitions = function (config, fsm, context) {
+	//	var transitions = _.map(config.events, function (transition) {
+	//		return transition.name
+	//	})
+	//	transitions = _.uniq(transitions)
+	//
+	//	// bind all functions
+	//	_.each(transitions, function (tran) {
+	//		context[tran] = fsm[tran].bind(fsm)
+	//	})
+	//}
 
+
+	// for View
 	var mixinTransitions2 = function (config, fsm, context) {
 		// store private properties
 		context._fsmEvents = _.pick(config, function (value, key) {
@@ -33,19 +49,26 @@ define(function (require, exports) {
 		context.delegateEvents(context._fsmEvents[config.initial])
 	}
 
-	exports.mixin = function (BackboneClass) {
+
+	/** Only Model */
+	exports.mixinModel = function (BackboneClass) {
 		var oldInitialize = BackboneClass.prototype.initialize
 
 		BackboneClass.prototype.initialize = function () {
 			if (BackboneClass.prototype.fsm) {
 				var config = BackboneClass.prototype.fsm
-				handleCallbacks(config, this)
+				addCallbacks(config, this)
 
 				var fsm = stateMachine.create(config) // no change prototype
-				mixinTransitions(config, fsm, this)
+				//mixinTransitions(config, fsm, this)
+				this._fsm = fsm
 			}
 
 			oldInitialize.apply(this, arguments)
+		}
+
+		BackboneClass.prototype.trans = function (name) {
+			this._fsm[name].apply(this._fsm, Array.prototype.slice.call(arguments, 1))
 		}
 
 		return BackboneClass
@@ -53,6 +76,7 @@ define(function (require, exports) {
 
 
 	// View don't need callbacks
+	/** Only View */
 	exports.mixinView = function (BackboneView) {
 		var oldInitialize = BackboneView.prototype.initialize
 
