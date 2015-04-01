@@ -1,8 +1,35 @@
 define(function (require) {
 	var backboneFSM = require('src/backbone-fsm')
+	var StateMachine = require('javascript-state-machine')
 
 	QUnit.module('backboneFSM')
 
+	QUnit.test('same state', function (assert) {
+		var c1 = 0
+		var c2 = 0
+		var fsm = StateMachine.create({
+			initial: 'hide',
+			events: [
+				{name: 'open', from: 'hide', to: 'show'},
+				{name: 'again', from: 'show', to: 'show'},
+				{name: 'close', from: 'show', to: 'hide'}
+			],
+			callbacks: {
+				onentershow: function () {
+					c1++
+				},
+				onafteragain: function () {
+					c2++
+				}
+			}
+		})
+		fsm.open()
+		fsm.again()
+		fsm.again()
+		fsm.close()
+		assert.equal(c1, 1)
+		assert.equal(c2, 2)
+	})
 
 	QUnit.test('mixin Model', function (assert) {
 		var c1 = 0
@@ -12,6 +39,7 @@ define(function (require) {
 				initial: 'hide',
 				events: [
 					{name: 'open', from: 'hide', to: 'show'},
+					{name: 'again', from: 'show', to: 'show'},
 					{name: 'close', from: 'show', to: 'hide'}
 				],
 				callbacks: {
@@ -38,6 +66,8 @@ define(function (require) {
 			transCloseCount++
 		})
 		model.trans('open')
+		model.trans('again')
+		model.trans('again')
 		model.trans('close', 'test')
 		assert.equal(enterShowCount, 1)
 		assert.equal(transCloseCount, 1)

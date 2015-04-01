@@ -11,13 +11,19 @@ define(function (require, exports) {
 	}
 
 
+	var clearArguments = function (args, event) {
+		args = Array.prototype.slice.call(args, 3)
+		Array.prototype.splice.call(args, 0, 0, event)
+		return args
+	}
+
 	var addCallbacks = function (config) {
 		config.callbacks = _.extend(config.callbacks, {
 			onenterstate: function (event, from, to) {
-				this.trigger('to:' + to, Array.prototype.slice.call(arguments, 1))
+				this.trigger.apply(this, clearArguments(arguments, 'to:' + to))
 			},
 			onafterevent: function (event) {
-				this.trigger('trans:' + event, Array.prototype.slice.call(arguments, 3))
+				this.trigger.apply(this, clearArguments(arguments, 'trans:' + event))
 			}
 		})
 	}
