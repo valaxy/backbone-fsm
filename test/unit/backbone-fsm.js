@@ -5,13 +5,23 @@ define(function (require) {
 
 
 	QUnit.test('mixin Model', function (assert) {
+		var c1 = 0
+		var c2 = 0
 		var Model = backboneFSM.mixinModel(Backbone.Model.extend({
 			fsm: {
 				initial: 'hide',
 				events: [
 					{name: 'open', from: 'hide', to: 'show'},
 					{name: 'close', from: 'show', to: 'hide'}
-				]
+				],
+				callbacks: {
+					onclose: function () {
+						c1++
+					},
+					onopen: function () {
+						c2++
+					}
+				}
 			}
 		}))
 
@@ -31,6 +41,8 @@ define(function (require) {
 		model.trans('close', 'test')
 		assert.equal(enterShowCount, 1)
 		assert.equal(transCloseCount, 1)
+		assert.equal(c1, 1)
+		assert.equal(c2, 1)
 	})
 
 	QUnit.test('mixin View', function (assert) {

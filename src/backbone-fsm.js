@@ -4,22 +4,22 @@ define(function (require, exports) {
 	var _ = require('underscore')
 
 
-	//var handleCallbacks = function (config, context) {
-	//	for (var name in config.callbacks) {
-	//		config.callbacks[name] = config.callbacks[name].bind(context)
-	//	}
-	//}
-
-
-	var addCallbacks = function (config, context) {
-		config.callbacks = {
-			onenterstate: (function (event, from, to) {
-				this.trigger('to:' + to, Array.prototype.slice.call(arguments, 1))
-			}).bind(context),
-			onafterevent: (function (event) {
-				this.trigger('trans:' + event, Array.prototype.slice.call(arguments, 3))
-			}).bind(context)
+	var handleCallbacks = function (config, context) {
+		for (var name in config.callbacks) {
+			config.callbacks[name] = config.callbacks[name].bind(context)
 		}
+	}
+
+
+	var addCallbacks = function (config) {
+		config.callbacks = _.extend(config.callbacks, {
+			onenterstate: function (event, from, to) {
+				this.trigger('to:' + to, Array.prototype.slice.call(arguments, 1))
+			},
+			onafterevent: function (event) {
+				this.trigger('trans:' + event, Array.prototype.slice.call(arguments, 3))
+			}
+		})
 	}
 
 
@@ -58,6 +58,7 @@ define(function (require, exports) {
 			if (BackboneClass.prototype.fsm) {
 				var config = BackboneClass.prototype.fsm
 				addCallbacks(config, this)
+				handleCallbacks(config, this)
 
 				var fsm = stateMachine.create(config) // no change prototype
 				//mixinTransitions(config, fsm, this)
