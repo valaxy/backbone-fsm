@@ -23,27 +23,11 @@ define(function (require, exports) {
 	}
 
 	var mixinTransitions2 = function (config, fsm, context) {
-		// get all transition names
-		var transitions = _.map(config.events, function (transition) {
-			return transition.name
-		})
-		transitions = _.uniq(transitions)
-
 		// store private properties
 		context._fsmEvents = _.pick(config, function (value, key) {
-			return ['initial', 'events', 'callbacks'].indexOf(key) < 0
+			return ['initial', 'events'].indexOf(key) < 0
 		})
 		context._fsm = fsm
-
-
-		// bind all functions
-		_.each(transitions, function (tran) {
-			context[tran] = function (/* args */) {
-				this.undelegateEvents(this._fsmEvents[this._fsm.current])
-				this._fsm[tran].apply(this._fsm, arguments)
-				this.delegateEvents(this._fsmEvents[this._fsm.current])
-			}
-		})
 
 		// bind initial
 		context.delegateEvents(context._fsmEvents[config.initial])
@@ -90,5 +74,4 @@ define(function (require, exports) {
 
 		return BackboneView
 	}
-
 })

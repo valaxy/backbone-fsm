@@ -36,14 +36,16 @@ define(function (require) {
 				initial: 'hide',
 				hide: {
 					'click': function () {
-						count++
+						this.trans('open')
+						count += 10
 						this.$el.show()
 					}
 				},
 				show: {
 					'click': function () {
-						count++
+						this.trans('close')
 						this.$el.hide()
+						count += 1
 					}
 				},
 				events: [
@@ -55,9 +57,9 @@ define(function (require) {
 
 		var view = new View
 		view.$el.click()
-		assert.equal(count, 1)
+		assert.equal(count, 10)
 
 		view.$el.click()
-		assert.equal(count, 2)
+		assert.equal(count, 11)
 	})
 })
