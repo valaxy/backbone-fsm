@@ -78,6 +78,10 @@ define(function (require, exports) {
 			this._fsm[name].apply(this._fsm, Array.prototype.slice.call(arguments, 1))
 		}
 
+		BackboneClass.prototype.state = function () {
+			return this._fsm.current
+		}
+
 		return BackboneClass
 	}
 

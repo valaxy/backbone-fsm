@@ -65,10 +65,19 @@ define(function (require) {
 			assert.equal(msg, 'test')
 			transCloseCount++
 		})
+
+		assert.equal(model.state(), 'hide')
+
 		model.trans('open')
+		assert.equal(model.state(), 'show')
+
 		model.trans('again')
 		model.trans('again')
+		assert.equal(model.state(), 'show')
+
 		model.trans('close', 'test')
+		assert.equal(model.state(), 'hide')
+		
 		assert.equal(enterShowCount, 1)
 		assert.equal(transCloseCount, 1)
 		assert.equal(c1, 1)
