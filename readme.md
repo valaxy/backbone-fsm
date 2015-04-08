@@ -1,4 +1,5 @@
 > This is under development, and API may change
+> `fsm` is conflict with `events`
 
 backbone-fsm is a plugin of Backbone for and only for AMD module
 
