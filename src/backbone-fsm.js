@@ -61,6 +61,8 @@ define(function (require, exports) {
 		var oldInitialize = BackboneClass.prototype.initialize
 
 		BackboneClass.prototype.initialize = function () {
+			oldInitialize.apply(this, arguments)
+
 			if (BackboneClass.prototype.fsm) {
 				var config = BackboneClass.prototype.fsm
 				addCallbacks(config, this)
@@ -70,8 +72,6 @@ define(function (require, exports) {
 				//mixinTransitions(config, fsm, this)
 				this._fsm = fsm
 			}
-
-			oldInitialize.apply(this, arguments)
 		}
 
 		BackboneClass.prototype.trans = function (name) {
@@ -92,18 +92,18 @@ define(function (require, exports) {
 		var oldInitialize = BackboneView.prototype.initialize
 
 		BackboneView.prototype.initialize = function () {
+			oldInitialize.apply(this, arguments)
+
 			if (BackboneView.prototype.fsm) {
 				var config = BackboneView.prototype.fsm
 				var fsm = stateMachine.create(config) // no change prototype
 				mixinTransitions2(config, fsm, this)
 			}
-
-			oldInitialize.apply(this, arguments)
 		}
 
 		BackboneView.prototype.trans = function (name) {
 			this.undelegateEvents(this._fsmEvents[this._fsm.current])
-			this._fsm[name].apply(this._fsm, arguments)
+			this._fsm[name].apply(this._fsm, Array.prototype.slice.call(arguments, 1))
 			this.delegateEvents(this._fsmEvents[this._fsm.current])
 		}
 
