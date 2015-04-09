@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "qunit": "~1.17.1",
-    "requirejs": "~2.1.17"
+    "requirejs": "~2.1.17",
+    "Sinon.JS": "cjohansen/Sinon.JS#~1.14.1"
   }
 }

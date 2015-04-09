@@ -1,6 +1,7 @@
 define(function (require) {
 	var backboneFSM = require('src/backbone-fsm')
 	var StateMachine = require('javascript-state-machine')
+	var sinon = require('sinon')
 
 	QUnit.module('backboneFSM')
 
@@ -31,7 +32,7 @@ define(function (require) {
 		assert.equal(c2, 2)
 	})
 
-	QUnit.test('mixin Model', function (assert) {
+	QUnit.test('mixinModel()', function (assert) {
 		var c1 = 0
 		var c2 = 0
 		var Model = backboneFSM.mixinModel(Backbone.Model.extend({
@@ -77,22 +78,22 @@ define(function (require) {
 
 		model.trans('close', 'test')
 		assert.equal(model.state(), 'hide')
-		
+
 		assert.equal(enterShowCount, 1)
 		assert.equal(transCloseCount, 1)
 		assert.equal(c1, 1)
 		assert.equal(c2, 1)
 	})
 
-	QUnit.test('mixin View', function (assert) {
-		var count = 0
+	QUnit.test('mixinView()', function (assert) {
+		var value = 0
 		var View = backboneFSM.mixinView(Backbone.View.extend({
 			fsm: {
 				initial: 'hide',
 				hide: {
 					'click': function () {
 						this.trans('open')
-						count += 10
+						value += 10
 						this.$el.show()
 					}
 				},
@@ -100,7 +101,7 @@ define(function (require) {
 					'click': function () {
 						this.trans('close')
 						this.$el.hide()
-						count += 1
+						value += 1
 					}
 				},
 				events: [
@@ -112,9 +113,58 @@ define(function (require) {
 
 		var view = new View
 		view.$el.click()
-		assert.equal(count, 10)
+		assert.equal(value, 10)
 
 		view.$el.click()
-		assert.equal(count, 11)
+		assert.equal(value, 11)
+	})
+
+	QUnit.test('mixinView(): setElement before initialize', function (assert) {
+		var spy = sinon.spy()
+		var View = backboneFSM.mixinView(Backbone.View.extend({
+			fsm: {
+				initial: 'hide',
+				hide: {
+					click: function (e) {
+						spy()
+						assert.equal($(e.currentTarget).text(), 'test me')
+					}
+				},
+				events: [
+					{name: 'open', from: 'hide', to: 'show'},
+					{name: 'close', from: 'show', to: 'hide'}
+				]
+			}
+		}))
+
+		var view = new View({
+			el: $('<div>test me</div>')
+		})
+		view.$el.click()
+		assert.ok(spy.calledOnce)
+	})
+
+	QUnit.test('mixinView(): setElement after initialize', function (assert) {
+		var spy = sinon.spy()
+		var View = backboneFSM.mixinView(Backbone.View.extend({
+			fsm: {
+				initial: 'hide',
+				hide: {
+					click: function (e) {
+						spy()
+						assert.equal($(e.currentTarget).text(), 'test me')
+					}
+				},
+				events: [
+					{name: 'open', from: 'hide', to: 'show'},
+					{name: 'close', from: 'show', to: 'hide'}
+				]
+			}
+		}))
+
+		var view = new View
+		view.setElement($('<div>test me</div>'))
+		view.$el.click()
+		assert.ok(spy.calledOnce)
 	})
 })

@@ -90,9 +90,14 @@ define(function (require, exports) {
 	/** Only View */
 	exports.mixinView = function (BackboneView) {
 		var oldInitialize = BackboneView.prototype.initialize
+		var oldSetElement = BackboneView.prototype.setElement
 
-		BackboneView.prototype.initialize = function () {
-			oldInitialize.apply(this, arguments)
+		//BackboneView.prototype.initialize = function () {
+		//	oldInitialize.apply(this, arguments)
+		//}
+
+		BackboneView.prototype.setElement = function () {
+			oldSetElement.apply(this, arguments)
 
 			if (BackboneView.prototype.fsm) {
 				var config = BackboneView.prototype.fsm
