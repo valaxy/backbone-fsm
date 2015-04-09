@@ -97,13 +97,15 @@ define(function (require, exports) {
 		//}
 
 		BackboneView.prototype.setElement = function () {
-			oldSetElement.apply(this, arguments)
+			var result = oldSetElement.apply(this, arguments)
 
 			if (BackboneView.prototype.fsm) {
 				var config = BackboneView.prototype.fsm
 				var fsm = stateMachine.create(config) // no change prototype
 				mixinTransitions2(config, fsm, this)
 			}
+
+			return result
 		}
 
 		BackboneView.prototype.trans = function (name) {
