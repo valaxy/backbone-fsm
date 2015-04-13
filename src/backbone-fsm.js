@@ -44,15 +44,22 @@ define(function (require, exports) {
 
 
 	// for View
-	var mixinTransitions2 = function (config, fsm, context) {
-		// store private properties
-		context._fsmEvents = _.pick(config, function (value, key) {
+	var initView = function (config, fsm, context) {
+		var fsmEvents = _.pick(config, function (value, key) {
 			return ['initial', 'events'].indexOf(key) < 0
 		})
+		context._fsmInits = _.mapObject(fsmEvents, function (value) {
+			if ('init' in value) {
+				return value['init']
+			} else {
+				return null
+			}
+		})
+		context._fsmEvents = _.mapObject(fsmEvents, function (value) {
+			delete value['init']
+			return value
+		})
 		context._fsm = fsm
-
-		// bind initial
-		context.delegateEvents(context._fsmEvents[config.initial])
 	}
 
 
@@ -89,29 +96,40 @@ define(function (require, exports) {
 	// View don't need callbacks
 	/** Only View */
 	exports.mixinView = function (BackboneView) {
-		var oldInitialize = BackboneView.prototype.initialize
 		var oldSetElement = BackboneView.prototype.setElement
+		var oldDelegateEvents = BackboneView.prototype.delegateEvents
 
-		//BackboneView.prototype.initialize = function () {
-		//	oldInitialize.apply(this, arguments)
-		//}
-
-		BackboneView.prototype.setElement = function () {
+		BackboneView.prototype.setElement = function () { // @todo
 			var result = oldSetElement.apply(this, arguments)
 
 			if (BackboneView.prototype.fsm) {
-				var config = BackboneView.prototype.fsm
-				var fsm = stateMachine.create(config) // no change prototype
-				mixinTransitions2(config, fsm, this)
+				var fsmConfig = BackboneView.prototype.fsm
+				var fsm = stateMachine.create(fsmConfig)
+				initView(fsmConfig, fsm, this)
 			}
 
 			return result
 		}
 
+
+		BackboneView.prototype.delegateEvents = function (events) {
+			if (!(events)) { // no events
+				events = _.result(this, 'events')
+				return oldDelegateEvents.call(this, _.extend({}, events, this._fsmEvents[this._fsm.current]))
+			} else {
+				return oldDelegateEvents.apply(this, arguments)
+			}
+		}
+
+
 		BackboneView.prototype.trans = function (name) {
-			this.undelegateEvents(this._fsmEvents[this._fsm.current])
-			this._fsm[name].apply(this._fsm, Array.prototype.slice.call(arguments, 1))
-			this.delegateEvents(this._fsmEvents[this._fsm.current])
+			var args = Array.prototype.slice.call(arguments, 1)
+
+			this._fsm[name].apply(this._fsm, args)
+			this.delegateEvents()
+
+			var newState = this._fsm.current
+			this._fsmInits[newState] ? this._fsmInits[newState].call(this) : undefined
 		}
 
 		return BackboneView

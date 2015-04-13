@@ -85,23 +85,36 @@ define(function (require) {
 		assert.equal(c2, 1)
 	})
 
-	QUnit.test('mixinView()', function (assert) {
-		var value = 0
+	QUnit.test('mixinView(): a full complete example', function (assert) {
+		var hideSpy = sinon.spy()
+		var showSpy = sinon.spy()
+		var clickWhenHide = sinon.spy()
+		var clickWhenShow = sinon.spy()
+		var clickAll = sinon.spy()
 		var View = backboneFSM.mixinView(Backbone.View.extend({
+			events: {
+				click: function () { // it will be override by fsm click
+					clickAll()
+				}
+			},
 			fsm: {
 				initial: 'hide',
 				hide: {
-					'click': function () {
+					init: function () {
+						hideSpy()
+					},
+					click: function () {
 						this.trans('open')
-						value += 10
-						this.$el.show()
+						clickWhenHide()
 					}
 				},
 				show: {
-					'click': function () {
+					init: function () {
+						showSpy()
+					},
+					click: function () {
 						this.trans('close')
-						this.$el.hide()
-						value += 1
+						clickWhenShow()
 					}
 				},
 				events: [
@@ -113,10 +126,13 @@ define(function (require) {
 
 		var view = new View
 		view.$el.click()
-		assert.equal(value, 10)
-
 		view.$el.click()
-		assert.equal(value, 11)
+
+		assert.equal(clickAll.callCount, 0)
+		assert.ok(clickWhenHide.calledOnce)
+		assert.ok(clickWhenShow.calledOnce)
+		assert.ok(showSpy.calledOnce)
+		assert.ok(hideSpy.calledOnce)
 	})
 
 	QUnit.test('mixinView(): setElement before initialize', function (assert) {
