@@ -66,4 +66,4 @@ var Model = backboneFSM.mixinModel(Backbone.Model.extend({
 ```
 
 ## Details
-I'm too lazy to write the document, please check the [unit test](tree/master/test/unit) to study what `backbone-fsm` can do
+I'm too lazy to write the document, please check the [unit test](https://github.com/valaxy/backbone-fsm/tree/master/test/unit) to study what `backbone-fsm` can do
