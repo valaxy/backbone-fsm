@@ -29,7 +29,7 @@ backboneFSM.mixin(Model)
 // mixin View
 var View = backboneFSM.mixin(Backbone.View.extend({
 	events: {
-		click: function () { // events will be override by fsm, so use fsm instead of events
+		click: function () { // `events` fired always sooner than `fsm`
 			clickAll()
 		}
 	},

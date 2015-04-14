@@ -93,13 +93,34 @@ define(function (require, exports) {
 	}
 
 
-	// View don't need callbacks
-	/** Only View */
+	var delegateEventSplitter = /^(\S+)\s*(.*)$/
+
+	// this is totally same with prototype.delegateEvents
+	var delegateEvents = function (events) {
+		for (var key in events) {
+			var method = events[key]
+			if (!_.isFunction(method)) method = this[events[key]]
+			if (!method) continue
+
+			var match = key.match(delegateEventSplitter)
+			var eventName = match[1], selector = match[2]
+			method = _.bind(method, this)
+			eventName += '.delegateEvents' + this.cid
+			if (selector === '') {
+				this.$el.on(eventName, method)
+			} else {
+				this.$el.on(eventName, selector, method)
+			}
+		}
+	}
+
+
+	/** mixin any Backbone.View */
 	exports.mixinView = function (BackboneView) {
 		var oldSetElement = BackboneView.prototype.setElement
 		var oldDelegateEvents = BackboneView.prototype.delegateEvents
 
-		BackboneView.prototype.setElement = function () { // @todo
+		BackboneView.prototype.setElement = function () {
 			var result = oldSetElement.apply(this, arguments)
 
 			if (BackboneView.prototype.fsm) {
@@ -113,12 +134,11 @@ define(function (require, exports) {
 
 
 		BackboneView.prototype.delegateEvents = function (events) {
-			if (!(events)) { // no events
-				events = _.result(this, 'events')
-				return oldDelegateEvents.call(this, _.extend({}, events, this._fsmEvents[this._fsm.current]))
-			} else {
-				return oldDelegateEvents.apply(this, arguments)
+			var result = oldDelegateEvents.apply(this, arguments)
+			if (!events) { // no events
+				delegateEvents.call(this, this._fsmEvents[this._fsm.current])
 			}
+			return result
 		}
 
 

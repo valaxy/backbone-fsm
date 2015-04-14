@@ -93,7 +93,7 @@ define(function (require) {
 		var clickAll = sinon.spy()
 		var View = backboneFSM.mixinView(Backbone.View.extend({
 			events: {
-				click: function () { // it will be override by fsm click
+				click: function () {
 					clickAll()
 				}
 			},
@@ -128,7 +128,7 @@ define(function (require) {
 		view.$el.click()
 		view.$el.click()
 
-		assert.equal(clickAll.callCount, 0)
+		assert.equal(clickAll.callCount, 2)
 		assert.ok(clickWhenHide.calledOnce)
 		assert.ok(clickWhenShow.calledOnce)
 		assert.ok(showSpy.calledOnce)
