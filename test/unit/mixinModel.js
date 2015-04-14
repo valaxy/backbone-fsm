@@ -1,4 +1,5 @@
 define(function (require) {
+	var Backbone = require('backbone')
 	var backboneFSM = require('src/backbone-fsm')
 	var StateMachine = require('javascript-state-machine')
 	var sinon = require('sinon')

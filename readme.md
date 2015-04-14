@@ -18,19 +18,15 @@ requirejs.config({
 
 ```
 
+## Mixin View
 ```javascript
-require('backbone')
+var Backbone = require('backbone')
 var backboneFSM = require('backbone-fsm')
 
-// mixin Model
-var Model = Backbone.Model.extend({ ... })
-backboneFSM.mixin(Model)
-
-// mixin View
 var View = backboneFSM.mixin(Backbone.View.extend({
 	events: {
 		click: function () { // `events` fired always sooner than `fsm`
-			clickAll()
+		    // do something for state `hide` and `show`
 		}
 	},
 	fsm: {
@@ -57,6 +53,16 @@ var View = backboneFSM.mixin(Backbone.View.extend({
 		]
 	}
 }))
+```
+
+## Mixin Model
+```javascript
+var Backbone = require('backbone')
+var backboneFSM = require('backbone-fsm')
+
+var Model = backboneFSM.mixinModel(Backbone.Model.extend({
+    ...
+})
 ```
 
 ## Details

@@ -1,4 +1,5 @@
 define(function (require) {
+	var Backbone = require('backbone')
 	var backboneFSM = require('src/backbone-fsm')
 	var sinon = require('sinon')
 
@@ -10,13 +11,11 @@ define(function (require) {
 				initial: 's0',
 				s0: {
 					click: function () {
-						console.log(1111)
 						this.trans('01')
 					}
 				},
 				s1: {
 					click: function () {
-						console.log(2222)
 						this.trans('12')
 					}
 				},
