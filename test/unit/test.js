@@ -1,3 +1,4 @@
 define(function (require) {
-	require('./backbone-fsm')
+	require('./mixinModel')
+	require('./mixinView')
 })

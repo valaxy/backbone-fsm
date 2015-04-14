@@ -1,91 +1,55 @@
 define(function (require) {
 	var backboneFSM = require('src/backbone-fsm')
-	var StateMachine = require('javascript-state-machine')
 	var sinon = require('sinon')
 
-	QUnit.module('backboneFSM')
+	QUnit.module('backboneFSM.mixinView()')
 
-	QUnit.test('same state', function (assert) {
-		var c1 = 0
-		var c2 = 0
-		var fsm = StateMachine.create({
-			initial: 'hide',
-			events: [
-				{name: 'open', from: 'hide', to: 'show'},
-				{name: 'again', from: 'show', to: 'show'},
-				{name: 'close', from: 'show', to: 'hide'}
-			],
-			callbacks: {
-				onentershow: function () {
-					c1++
-				},
-				onafteragain: function () {
-					c2++
-				}
-			}
-		})
-		fsm.open()
-		fsm.again()
-		fsm.again()
-		fsm.close()
-		assert.equal(c1, 1)
-		assert.equal(c2, 2)
-	})
-
-	QUnit.test('mixinModel()', function (assert) {
-		var c1 = 0
-		var c2 = 0
-		var Model = backboneFSM.mixinModel(Backbone.Model.extend({
+	QUnit.test('trans()/state()', function (assert) {
+		var View = backboneFSM.mixinView(Backbone.View.extend({
 			fsm: {
-				initial: 'hide',
-				events: [
-					{name: 'open', from: 'hide', to: 'show'},
-					{name: 'again', from: 'show', to: 'show'},
-					{name: 'close', from: 'show', to: 'hide'}
-				],
-				callbacks: {
-					onclose: function () {
-						c1++
-					},
-					onopen: function () {
-						c2++
+				initial: 's0',
+				s0: {
+					click: function () {
+						console.log(1111)
+						this.trans('01')
 					}
-				}
+				},
+				s1: {
+					click: function () {
+						console.log(2222)
+						this.trans('12')
+					}
+				},
+				s2: {
+					click: function () {
+						this.trans('20')
+					}
+				},
+				events: [
+					{name: '01', from: 's0', to: 's1'},
+					{name: '12', from: 's1', to: 's2'},
+					{name: '20', from: 's2', to: 's0'}
+				]
 			}
 		}))
 
-		var model = new Model
-		var enterShowCount = 0
-		model.listenTo(model, 'to:show', function () {
-			enterShowCount++
-			assert.equal(this, model)
-		})
-		var transCloseCount = 0
-		model.listenTo(model, 'trans:close', function (msg) {
-			assert.equal(this, model)
-			assert.equal(msg, 'test')
-			transCloseCount++
-		})
+		var v = new View
+		assert.equal(v.state(), 's0')
 
-		assert.equal(model.state(), 'hide')
+		v.$el.click()
+		assert.equal(v.state(), 's1')
 
-		model.trans('open')
-		assert.equal(model.state(), 'show')
+		v.$el.click()
+		assert.equal(v.state(), 's2')
 
-		model.trans('again')
-		model.trans('again')
-		assert.equal(model.state(), 'show')
+		v.$el.click()
+		assert.equal(v.state(), 's0')
 
-		model.trans('close', 'test')
-		assert.equal(model.state(), 'hide')
-
-		assert.equal(enterShowCount, 1)
-		assert.equal(transCloseCount, 1)
-		assert.equal(c1, 1)
-		assert.equal(c2, 1)
+		v.$el.click()
+		assert.equal(v.state(), 's1')
 	})
 
-	QUnit.test('mixinView(): a full complete example', function (assert) {
+	QUnit.test('a full complete example', function (assert) {
 		var hideSpy = sinon.spy()
 		var showSpy = sinon.spy()
 		var clickWhenHide = sinon.spy()
@@ -135,7 +99,7 @@ define(function (require) {
 		assert.ok(hideSpy.calledOnce)
 	})
 
-	QUnit.test('mixinView(): setElement before initialize', function (assert) {
+	QUnit.test('setElement before initialize', function (assert) {
 		var spy = sinon.spy()
 		var View = backboneFSM.mixinView(Backbone.View.extend({
 			fsm: {
@@ -160,7 +124,7 @@ define(function (require) {
 		assert.ok(spy.calledOnce)
 	})
 
-	QUnit.test('mixinView(): setElement after initialize', function (assert) {
+	QUnit.test('setElement after initialize', function (assert) {
 		var spy = sinon.spy()
 		var View = backboneFSM.mixinView(Backbone.View.extend({
 			fsm: {
