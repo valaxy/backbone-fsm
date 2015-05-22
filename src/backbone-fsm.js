@@ -120,6 +120,17 @@ define(function (require, exports) {
 	}
 
 
+	var bindCallbacks = function (config) {
+		if (config.callbacks) {
+			var c = config.callbacks
+			for (var key in c) {
+				c[key] = c[key].bind(this)
+			}
+		}
+		return config
+	}
+
+
 	/** mixin any Backbone.View */
 	exports.mixinView = function (BackboneView) {
 		var oldSetElement = BackboneView.prototype.setElement
@@ -130,7 +141,7 @@ define(function (require, exports) {
 
 			if (BackboneView.prototype.fsm) {
 				var fsmConfig = BackboneView.prototype.fsm
-				var fsm = stateMachine.create(fsmConfig)
+				var fsm = stateMachine.create(bindCallbacks.call(this, fsmConfig))
 				initView.call(this, fsmConfig, fsm)
 				callInit.call(this, this._fsm.current)
 			}

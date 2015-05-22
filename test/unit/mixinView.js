@@ -160,6 +160,7 @@ define(function (require) {
 				callbacks: {
 					onopen: function () {
 						spy()
+						assert.equal(this, v)
 					}
 				}
 			}
