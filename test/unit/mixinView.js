@@ -146,4 +146,29 @@ define(function (require) {
 		view.$el.click()
 		assert.ok(spy.calledOnce)
 	})
+
+
+	QUnit.test('callbacks', function (assert) {
+		var spy = sinon.spy()
+		var View = backboneFSM.mixinView(Backbone.View.extend({
+			fsm: {
+				initial  : 'hide',
+				events   : [
+					{name: 'open', from: 'hide', to: 'show'},
+					{name: 'close', from: 'show', to: 'hide'}
+				],
+				callbacks: {
+					onopen: function () {
+						spy()
+					}
+				}
+			}
+		}))
+
+		var v = new View
+		v.trans('open')
+		v.trans('close')
+		v.trans('open')
+		assert.equal(spy.callCount, 2)
+	})
 })
