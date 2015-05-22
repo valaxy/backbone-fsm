@@ -9,22 +9,22 @@ define(function (require) {
 		var View = backboneFSM.mixinView(Backbone.View.extend({
 			fsm: {
 				initial: 's0',
-				s0: {
+				s0     : {
 					click: function () {
 						this.trans('01')
 					}
 				},
-				s1: {
+				s1     : {
 					click: function () {
 						this.trans('12')
 					}
 				},
-				s2: {
+				s2     : {
 					click: function () {
 						this.trans('20')
 					}
 				},
-				events: [
+				events : [
 					{name: '01', from: 's0', to: 's1'},
 					{name: '12', from: 's1', to: 's2'},
 					{name: '20', from: 's2', to: 's0'}
@@ -60,10 +60,10 @@ define(function (require) {
 					clickAll()
 				}
 			},
-			fsm: {
+			fsm   : {
 				initial: 'hide',
-				hide: {
-					init: function () {
+				hide   : {
+					init : function () {
 						hideSpy()
 					},
 					click: function () {
@@ -71,8 +71,8 @@ define(function (require) {
 						clickWhenHide()
 					}
 				},
-				show: {
-					init: function () {
+				show   : {
+					init : function () {
 						showSpy()
 					},
 					click: function () {
@@ -80,7 +80,7 @@ define(function (require) {
 						clickWhenShow()
 					}
 				},
-				events: [
+				events : [
 					{name: 'open', from: 'hide', to: 'show'},
 					{name: 'close', from: 'show', to: 'hide'}
 				]
@@ -95,7 +95,7 @@ define(function (require) {
 		assert.ok(clickWhenHide.calledOnce)
 		assert.ok(clickWhenShow.calledOnce)
 		assert.ok(showSpy.calledOnce)
-		assert.ok(hideSpy.calledOnce)
+		assert.equal(hideSpy.callCount, 2)
 	})
 
 	QUnit.test('setElement before initialize', function (assert) {
@@ -103,13 +103,13 @@ define(function (require) {
 		var View = backboneFSM.mixinView(Backbone.View.extend({
 			fsm: {
 				initial: 'hide',
-				hide: {
+				hide   : {
 					click: function (e) {
 						spy()
 						assert.equal($(e.currentTarget).text(), 'test me')
 					}
 				},
-				events: [
+				events : [
 					{name: 'open', from: 'hide', to: 'show'},
 					{name: 'close', from: 'show', to: 'hide'}
 				]
@@ -128,13 +128,13 @@ define(function (require) {
 		var View = backboneFSM.mixinView(Backbone.View.extend({
 			fsm: {
 				initial: 'hide',
-				hide: {
+				hide   : {
 					click: function (e) {
 						spy()
 						assert.equal($(e.currentTarget).text(), 'test me')
 					}
 				},
-				events: [
+				events : [
 					{name: 'open', from: 'hide', to: 'show'},
 					{name: 'close', from: 'show', to: 'hide'}
 				]

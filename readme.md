@@ -1,4 +1,4 @@
-> This is under development, but you can check what this module can do
+> This is under development, API is not stable
 
 Backbone-fsm is a plugin of Backbone which mixin fsm(finite state machine) to design a UI component, it's AMD module.
 

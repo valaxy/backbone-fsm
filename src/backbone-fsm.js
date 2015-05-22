@@ -115,6 +115,11 @@ define(function (require, exports) {
 	}
 
 
+	var callInit = function (state) {
+		this._fsmInits[state] ? this._fsmInits[state].call(this) : undefined
+	}
+
+
 	/** mixin any Backbone.View */
 	exports.mixinView = function (BackboneView) {
 		var oldSetElement = BackboneView.prototype.setElement
@@ -127,6 +132,7 @@ define(function (require, exports) {
 				var fsmConfig = BackboneView.prototype.fsm
 				var fsm = stateMachine.create(fsmConfig)
 				initView.call(this, fsmConfig, fsm)
+				callInit.call(this, this._fsm.current)
 			}
 
 			return result
