@@ -53,7 +53,7 @@ define(function (require) {
 			},
 
 			initialize: function () {
-				this.listenTo(this, 'before:again', function (options) {
+				this.listenTo(this, 'before:again', function (msg, options) {
 					options.cancel = true
 				})
 				this.listenTo(this, 'leave:test', function (options) {
@@ -67,8 +67,8 @@ define(function (require) {
 		var m = new Model
 
 		m.trans('open')
-		m.trans('again')
-		m.trans('again')
+		m.trans('again', 'msg')
+		m.trans('again', 'msg')
 		m.trans('close')
 
 		m.trans('totest')
