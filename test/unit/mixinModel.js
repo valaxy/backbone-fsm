@@ -19,13 +19,16 @@ define(function (require) {
 			},
 
 			initialize: function () {
-				this.listenTo(this, 'enter:show', c1)
+				this.listenTo(this, 'enter:show', function (str) {
+					c1()
+					assert.equal(str, 'abc')
+				})
 				this.listenTo(this, 'after:again', c2)
 			}
 		}))
 		var m = new Model
 
-		m.trans('open')
+		m.trans('open', 'abc')
 		m.trans('again')
 		m.trans('again')
 		m.trans('close')
