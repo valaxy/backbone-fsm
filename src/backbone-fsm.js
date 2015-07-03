@@ -4,74 +4,23 @@ define(function (require, exports) {
 	var _ = require('underscore')
 
 
-	var handleCallbacks = function (config, context) {
-		for (var name in config.callbacks) {
-			config.callbacks[name] = config.callbacks[name].bind(context)
-		}
-	}
-
-
-	var clearArguments = function (args, event) {
-		args = Array.prototype.slice.call(args, 3)
-		Array.prototype.splice.call(args, 0, 0, event)
-		return args
-	}
-
-	var addCallbacks = function (config) {
-		config.callbacks = _.extend(config.callbacks, {
-			onenterstate: function (event, from, to) {
-				this.trigger.apply(this, clearArguments(arguments, 'to:' + to))
-			},
-			onafterevent: function (event) {
-				this.trigger.apply(this, clearArguments(arguments, 'trans:' + event))
-			}
-		})
-	}
-
-
-	//// for Model
-	//var mixinTransitions = function (config, fsm, context) {
-	//	var transitions = _.map(config.events, function (transition) {
-	//		return transition.name
-	//	})
-	//	transitions = _.uniq(transitions)
-	//
-	//	// bind all functions
-	//	_.each(transitions, function (tran) {
-	//		context[tran] = fsm[tran].bind(fsm)
-	//	})
+	//var clearArguments = function (args, event) {
+	//	args = Array.prototype.slice.call(args, 3)
+	//	Array.prototype.splice.call(args, 0, 0, event)
+	//	return args
 	//}
 
-
-	/** Only Model */
-	exports.mixinModel = function (BackboneClass) {
-		var oldInitialize = BackboneClass.prototype.initialize
-
-		BackboneClass.prototype.initialize = function () {
-			oldInitialize.apply(this, arguments)
-
-			if (BackboneClass.prototype.fsm) {
-				var config = BackboneClass.prototype.fsm
-				addCallbacks(config, this)
-				handleCallbacks(config, this)
-
-				var fsm = stateMachine.create(config) // no change prototype
-				//mixinTransitions(config, fsm, this)
-				this._fsm = fsm
-			}
+	var addCallbacks = function (config) {
+		config.callbacks = {
+			onafterevent: (function (event) {
+				this.trigger.call(this, 'after:' + event)
+			}).bind(this),
+			onenterstate: (function (event, from, to) {
+				this.trigger.call(this, 'enter:' + to)
+			}).bind(this)
 		}
-
-		BackboneClass.prototype.trans = function (name) {
-			this._fsm[name].apply(this._fsm, Array.prototype.slice.call(arguments, 1))
-		}
-
-		BackboneClass.prototype.state = function () {
-			return this._fsm.current
-		}
-
-		return BackboneClass
+		return config
 	}
-
 
 	var delegateEventSplitter = /^(\S+)\s*(.*)$/
 
@@ -176,5 +125,32 @@ define(function (require, exports) {
 		}
 
 		return BackboneView
+	}
+
+	/** mixin any Backbone.Model */
+	exports.mixinModel = function (BackboneModel) {
+		var oldInitialize = BackboneModel.prototype.initialize
+
+		BackboneModel.prototype.initialize = function () {
+			var result = oldInitialize.apply(this, arguments)
+
+			if (BackboneModel.prototype.fsm) {
+				var fsmConfig = addCallbacks.call(this, BackboneModel.prototype.fsm)
+				var fsm = stateMachine.create(fsmConfig)
+				this._fsm = fsm
+			}
+
+			return result
+		}
+
+		BackboneModel.prototype.trans = function (name) {
+			this._fsm[name].apply(this._fsm, Array.prototype.slice.call(arguments, 1))
+		}
+
+		BackboneModel.prototype.state = function () {
+			return this._fsm.current
+		}
+
+		return BackboneModel
 	}
 })

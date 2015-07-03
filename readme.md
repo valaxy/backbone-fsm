@@ -61,9 +61,23 @@ var Backbone = require('backbone')
 var backboneFSM = require('backbone-fsm')
 
 var Model = backboneFSM.mixinModel(Backbone.Model.extend({
-    ...
+    fsm: {
+    	key: 'state', // optional
+    	initial: 'hide',
+    	events: [
+    		{name: 'open', from: 'hide', to: 'show'},
+    		{name: 'close', from: 'show', to: 'hide'}
+    	]
+    },
+    initialize: function () {
+    	this.listenTo(this.model, 'enter:state', function() { ... })
+    	this.listenTo(this.model, 'after:edge', function() { ... })
+    	this.trans('...')
+    }
 })
 ```
+
+ATTENTION: 'enter:state' will not trigger when enter to the same state
 
 ## Details
 I'm too lazy to write the document, please check the [unit test](https://github.com/valaxy/backbone-fsm/tree/master/test/unit) to study what `backbone-fsm` can do
