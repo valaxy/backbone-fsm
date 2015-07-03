@@ -4,19 +4,32 @@ define(function (require, exports) {
 	var _ = require('underscore')
 
 
-	var clearArguments = function (args, event) {
+	var buildArguments = function (args, event, options) {
 		args = Array.prototype.slice.call(args, 3)
 		Array.prototype.splice.call(args, 0, 0, event)
+		if (options !== undefined) {
+			args.push(options)
+		}
 		return args
 	}
 
 	var addCallbacks = function (config) {
 		config.callbacks = {
-			onafterevent: (function (event) {
-				this.trigger.apply(this, clearArguments(arguments, 'after:' + event))
+			onbeforeevent: (function (event) {
+				var options = {cancel: false}
+				this.trigger.apply(this, buildArguments(arguments, 'before:' + event, options))
+				return !options.cancel
+			}.bind(this)),
+			onafterevent : (function (event) {
+				this.trigger.apply(this, buildArguments(arguments, 'after:' + event))
 			}).bind(this),
-			onenterstate: (function (event, from, to) {
-				this.trigger.apply(this, clearArguments(arguments, 'enter:' + to))
+			onleavestate : (function (event, from, to) {
+				var options = {cancel: false}
+				this.trigger.apply(this, buildArguments(arguments, 'leave:' + from, options))
+				return !options.cancel
+			}).bind(this),
+			onenterstate : (function (event, from, to) {
+				this.trigger.apply(this, buildArguments(arguments, 'enter:' + to))
 			}).bind(this)
 		}
 		return config
