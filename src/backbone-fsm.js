@@ -29,6 +29,7 @@ define(function (require, exports) {
 				return !options.cancel
 			}).bind(this),
 			onenterstate : (function (event, from, to) {
+				this.set(this._fsmKey, to)
 				this.trigger.apply(this, buildArguments(arguments, 'enter:' + to))
 			}).bind(this)
 		}
@@ -148,9 +149,12 @@ define(function (require, exports) {
 			var result = oldInitialize.apply(this, arguments)
 
 			if (BackboneModel.prototype.fsm) {
-				var fsmConfig = addCallbacks.call(this, BackboneModel.prototype.fsm)
+				var fsmConfig = BackboneModel.prototype.fsm
+				this._fsmKey = fsmConfig.key || 'state'
+				var fsmConfig = addCallbacks.call(this, fsmConfig)
 				var fsm = stateMachine.create(fsmConfig)
 				this._fsm = fsm
+
 			}
 
 			return result

@@ -8,8 +8,10 @@ define(function (require) {
 	QUnit.test('same state', function (assert) {
 		var c1 = sinon.spy()
 		var c2 = sinon.spy()
+		var c3 = sinon.spy()
 		var Model = backboneFSM.mixinModel(Backbone.Model.extend({
 			fsm: {
+				key    : 'mystate',
 				initial: 'hide',
 				events : [
 					{name: 'open', from: 'hide', to: 'show'},
@@ -24,6 +26,7 @@ define(function (require) {
 					assert.equal(str, 'abc')
 				})
 				this.listenTo(this, 'after:again', c2)
+				this.listenTo(this, 'change:mystate', c3)
 			}
 		}))
 		var m = new Model
@@ -34,6 +37,7 @@ define(function (require) {
 		m.trans('close')
 		assert.equal(c1.callCount, 1) // only trigger once
 		assert.equal(c2.callCount, 2)
+		assert.equal(c3.callCount, 3)
 	})
 
 	QUnit.test('cancel event', function (assert) {
