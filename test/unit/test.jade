@@ -3,24 +3,25 @@ html
     head
         meta(charset="utf-8")
         title Qunit Unit test
-        link(rel="stylesheet" href="../../bower_components/qunit/qunit/qunit.css")
+        link(rel="stylesheet" href="../../node_modules/qunitjs/qunit/qunit.css")
     body
         div#qunit
         div#qunit-fixture
 
-        script(src="../../bower_components/qunit/qunit/qunit.js")
-        script(src="../../bower_components/requirejs/require.js")
+        script(src="../../node_modules/qunitjs/qunit/qunit.js")
+        script(src="../../node_modules/requirejs/require.js")
         script.
             require.config({
                 baseUrl: '../../',
-                paths: {
-                    'jquery': 'bower_components/jquery/dist/jquery.min',
-                    'underscore': 'bower_components/underscore/underscore-min',
-                    'backbone': 'bower_components/backbone/backbone',
-                    'javascript-state-machine': 'bower_components/javascript-state-machine/state-machine',
-                    'sinon': 'bower_components/Sinon.JS/lib/sinon'
+                paths  : {
+                    'jquery'                  : 'node_modules/jquery/dist/jquery',
+                    'underscore'              : 'node_modules/underscore/underscore-min',
+                    'backbone'                : 'node_modules/backbone/backbone',
+                    'javascript-state-machine': 'node_modules/javascript-state-machine/state-machine',
+                    'sinon'                   : 'node_modules/sinon/lib/sinon'
                 }
             })
+            QUnit.config.autostart = false
             require(['test/unit/test'], function () {
-                // do nothing
+                QUnit.start()
             })

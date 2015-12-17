@@ -1,6 +1,6 @@
 define(function (require) {
 	var Backbone = require('backbone')
-	var backboneFSM = require('src/backbone-fsm')
+	var backboneFSM = require('lib/backbone-fsm')
 	var sinon = require('sinon')
 
 	QUnit.module('backboneFSM.mixinModel()')

@@ -8,7 +8,6 @@ setup `bower install valaxy/backbone-fsm --save`
 ```javascript
 requirejs.config({
     paths: {
-        'jquery':                   'bower_components/jquery/dist/jquery.min',
         'underscore':               'bower_components/underscore/underscore-min',
         'backbone':                 'bower_components/backbone/backbone',
         'javascript-state-machine': 'bower_components/javascript-state-machine/state-machine',

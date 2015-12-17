@@ -1,0 +1,21 @@
+{
+  "name": "backbone-fsm",
+  "version": "0.1.0-dev",
+  "main": "lib/backbone-fsm.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/valaxy/backbone-fsm.git"
+  },
+  "author": "valaxy",
+  "license": "MIT",
+  "dependencies": {
+    "backbone": "^1.2.3",
+    "javascript-state-machine": "^2.3.5",
+    "jquery": "^2.1.4"
+  },
+  "devDependencies": {
+    "qunitjs": "^1.20.0",
+    "requirejs": "^2.1.22",
+    "sinon": "^1.17.2"
+  }
+}
